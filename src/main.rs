@@ -21,7 +21,6 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 use clap::{Arg, App};
 
-
 static TURBO_LOCATION: &'static str = "/sys/devices/system/cpu/intel_pstate/no_turbo";
 static CONSERVATION_LOCATION: &'static str = "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode";
 
@@ -45,7 +44,7 @@ fn main()
     if matches.is_present("no_turbo")
     {
         let argument_value = matches.value_of("no_turbo");
-        let feature = "No turbo boost";
+        let feature = "No turbo boost mode";
 
         if argument_value == Some("status")
         {
@@ -53,12 +52,12 @@ fn main()
         }
         else if argument_value == Some("enable")
         {
-            println!("No turbo boost enabled.");
+            println!("{} enabled.", feature);
             change_value(argument_value, TURBO_LOCATION);
         }
         else if argument_value == Some("disable")
         {
-            println!("No turbo boost disabled.");
+            println!("{} disabled.", feature);
             change_value(argument_value, TURBO_LOCATION);
         }
         else
@@ -77,12 +76,12 @@ fn main()
         }
         else if argument_value == Some("enable")
         {
-            println!("Conservation mode enabled.");
+            println!("{} enabled.", feature);
             change_value(argument_value, CONSERVATION_LOCATION);
         }
         else if argument_value == Some("disable")
         {
-            println!("Conservation mode disabled.");
+            println!("{} disabled.", feature);
             change_value(argument_value, CONSERVATION_LOCATION);
         }
         else
