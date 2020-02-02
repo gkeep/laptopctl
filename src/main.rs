@@ -27,7 +27,7 @@ static CONSERVATION_LOCATION: &'static str = "/sys/bus/platform/drivers/ideapad_
 fn main()
 {
     let matches = App::new("laptopctl")
-        .version("0.2.0")
+        .version("0.2.1")
         .author("gkeep")
         .arg(Arg::with_name("no_turbo")
             .short("t")
