@@ -1,6 +1,6 @@
 [package]
 name = "laptopctl"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["gkeep <gkeep77@protonmail.com>"]
 edition = "2018"
 repository = "https://github.com/gkeep/laptopctl"
