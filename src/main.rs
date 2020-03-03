@@ -19,7 +19,7 @@ extern crate clap;
 use clap::{App, Arg};
 use std::fs;
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::prelude::*;
 
 static TURBO_LOCATION: &'static str = "/sys/devices/system/cpu/intel_pstate/no_turbo";
 static CONSERVATION_LOCATION: &'static str =
@@ -27,7 +27,7 @@ static CONSERVATION_LOCATION: &'static str =
 
 fn main() {
     let matches = App::new("laptopctl")
-        .version("0.2.2")
+        .version("0.3.0")
         .author("gkeep")
         .arg(
             Arg::with_name("no_turbo")
@@ -50,30 +50,30 @@ fn main() {
         let feature = "No turbo boost mode";
 
         if argument_value == Some("status") {
-            get_status(TURBO_LOCATION, feature);
+            println!("{} is {}.", feature, get_status(TURBO_LOCATION));
         } else if argument_value == Some("enable") {
-            println!("{} enabled.", feature);
+            println!("{} on.", feature);
             change_value(argument_value, TURBO_LOCATION);
         } else if argument_value == Some("disable") {
-            println!("{} disabled.", feature);
+            println!("{} off.", feature);
             change_value(argument_value, TURBO_LOCATION);
         } else {
-            println!("Unknown value. Known values:\nenable disable status");
+            println!("Unknown value. Valid actions: enable disable status");
         }
     } else if matches.is_present("conservation_mode") {
         let argument_value = matches.value_of("conservation_mode");
         let feature = "Conservation mode";
 
         if argument_value == Some("status") {
-            get_status(CONSERVATION_LOCATION, feature);
+            println!("{} is {}.", feature, get_status(CONSERVATION_LOCATION));
         } else if argument_value == Some("enable") {
-            println!("{} enabled.", feature);
+            println!("{} on.", feature);
             change_value(argument_value, CONSERVATION_LOCATION);
         } else if argument_value == Some("disable") {
-            println!("{} disabled.", feature);
+            println!("{} off.", feature);
             change_value(argument_value, CONSERVATION_LOCATION);
         } else {
-            println!("Unknown value. Known values:\nenable disable status");
+            println!("Unknown value. Valid actions: enable disable status");
         }
     }
 }
@@ -81,30 +81,27 @@ fn main() {
 /* Changes value depending on first argument
  * second argument is locaiton of the file that OS speaks to */
 fn change_value(value: Option<&str>, location: &str) {
-    match value {
-        Some("enable") => {
-            let new_value = "1";
-            fs::write(location, new_value).expect("Unable to write to file.");
-        }
-        Some("disable") => {
-            let new_value = "0";
-            fs::write(location, new_value).expect("Unable to write to file.");
-        }
-        _ => println!("ERROR: Unknown action. Valid actions: enable; disable"),
+    if value == Some("enable") {
+        fs::write(location, "1").expect("Unable to write to file.");
+    } else if value == Some("disable") {
+        fs::write(location, "0").expect("Unable to write to file.");
+    } else {
+        println!("ERROR: Unknown action. Valid actions: enable disable")
     }
 }
 
 /* Get current value of the file,
  * i.e. whether or not a feature is active */
-fn get_status(location: &str, feature: &str) {
-    let file = File::open(location).unwrap();
-    let buffer = BufReader::new(file);
+fn get_status(location: &str) -> &str {
+    let mut file = File::open(location).unwrap();
+    let mut content = String::new();
+    file.read_to_string(&mut content).expect("Couldn't read status.");
 
-    for line in buffer.lines() {
-        if line.unwrap() == 1.to_string() {
-            println!("{} is enabled", feature);
-        } else {
-            println!("{} is disabled", feature);
-        }
+    if content == "1" {
+        return "on";
+    } else if content == "0" {
+        return "off";
+    } else {
+        return "unknown";
     }
 }
