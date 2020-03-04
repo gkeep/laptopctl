@@ -19,7 +19,7 @@ extern crate clap;
 use clap::{App, Arg};
 use std::fs;
 use std::fs::File;
-use std::io::prelude::*;
+use std::io::prelude::Read;
 
 static TURBO_LOCATION: &'static str = "/sys/devices/system/cpu/intel_pstate/no_turbo";
 static CONSERVATION_LOCATION: &'static str =
@@ -27,7 +27,7 @@ static CONSERVATION_LOCATION: &'static str =
 
 fn main() {
     let matches = App::new("laptopctl")
-        .version("0.3.0")
+        .version("0.3.1")
         .author("gkeep")
         .arg(
             Arg::with_name("no_turbo")
@@ -96,6 +96,8 @@ fn get_status(location: &str) -> &str {
     let mut file = File::open(location).unwrap();
     let mut content = String::new();
     file.read_to_string(&mut content).expect("Couldn't read status.");
+    // Remove \n from the input file
+    content.truncate(content.len() - 1);
 
     if content == "1" {
         return "on";
